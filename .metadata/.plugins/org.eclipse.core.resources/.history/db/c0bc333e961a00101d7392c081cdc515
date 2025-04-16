@@ -1,0 +1,2 @@
+spring.application.name=observability
+server.port=8062
