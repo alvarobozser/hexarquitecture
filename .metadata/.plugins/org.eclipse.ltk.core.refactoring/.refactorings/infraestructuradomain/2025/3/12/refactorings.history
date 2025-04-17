@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Move &apos;infraestructuradomain&apos; to &apos;infraestructuradomain&apos;" description="Move &apos;infraestructuradomain&apos; to &apos;infraestructuradomain&apos;" destination="/infraestructuradomain" element1="/paymentchain/infraestructuradomain" flags="7" id="org.eclipse.ltk.core.refactoring.move.resources" resources="1" stamp="1742541512576" updateReferences="true"/>
-</session>
