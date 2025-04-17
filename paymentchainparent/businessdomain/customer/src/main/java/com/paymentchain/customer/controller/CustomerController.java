@@ -70,8 +70,13 @@ public class CustomerController {
     }
     
     @GetMapping()
-    public List<Customer> list() {
-        return customerRepository.findAll();
+    public ResponseEntity<List<Customer>> list() {
+         List<Customer> all = customerRepository.findAll();
+        if (!all.isEmpty()) {
+            return new ResponseEntity<>(all, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }   
     
     @GetMapping("/{id}")
@@ -100,7 +105,7 @@ public class CustomerController {
     public ResponseEntity<?> post(@RequestBody Customer input) { 	
     	input.getProducts().forEach(product -> product.setCustomer(input));  	
         Customer save = customerRepository.save(input);
-        return ResponseEntity.ok(save);
+        return ResponseEntity.status(HttpStatus.CREATED).body(save);
     }
     
     @DeleteMapping("/{id}")

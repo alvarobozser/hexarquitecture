@@ -89,6 +89,9 @@ application-*.yaml
 *.zip
 *.tar.gz
 *.rar
+.log
+.snap
+.index
 
 ### Java ###
 # Compiled class file
