@@ -1,17 +1,11 @@
 package com.paymentchain.customer.controller;
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,18 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClient;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.paymentchain.customer.entities.Customer;
-import com.paymentchain.customer.entities.CustomerProducts;
 import com.paymentchain.customer.repository.CustomerRepository;
-
-import io.netty.channel.ChannelOption;
-import io.netty.channel.epoll.EpollChannelOption;
-import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.netty.handler.timeout.WriteTimeoutHandler;
-import reactor.netty.http.client.HttpClient;
+import com.paymentchain.customer.transactions.BusinessTransactions;
 
 @RestController
 @RequestMapping("/customer") 
@@ -42,28 +28,12 @@ public class CustomerController {
     private CustomerRepository customerRepository;
     
     @Autowired
-    private Environment environment;
+    private BusinessTransactions businessTransactions;
     
     @Autowired
-    private WebClient.Builder webClientBuilder;
+    private Environment environment;
     
-    /*private final WebClient.Builder webClientBuilder;
     
-    public CustomerController(WebClient.Builder webClientBuilder) {
-    	this.webClientBuilder=webClientBuilder;
-    }*/
-    
-    HttpClient httpClient = HttpClient.create()
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-            .option(ChannelOption.SO_KEEPALIVE, true)
-            .option(EpollChannelOption.TCP_KEEPIDLE, 300)
-            .option(EpollChannelOption.TCP_KEEPINTVL, 60)
-            .responseTimeout(Duration.ofSeconds(1))
-            .doOnConnected(conn ->
-                    conn.addHandlerLast(new ReadTimeoutHandler(5, TimeUnit.SECONDS)) 
-                        .addHandlerLast(new WriteTimeoutHandler(5, TimeUnit.SECONDS)));
-
-   
     @GetMapping("/check")
     public String check() {
         return environment.getProperty("customer.activeprofileName");
@@ -116,43 +86,7 @@ public class CustomerController {
     
     @GetMapping("/full")
     public Customer getByCode(@RequestParam String code) {
-    	Customer customer = customerRepository.findByCode(code);
-    	List<CustomerProducts> products = customer.getProducts();
-    	products.forEach(x->{
-    		x.setProductName(getProductName(x.getId()));
-    		});
-    	List<?> transactions = getTransactions(customer.getIban());
-    	customer.setTransactions(transactions);
-    	
-    	return customer;
+    	return businessTransactions.getByCode(code);  
     }
-    
-    private String getProductName(Long id) {
-    	WebClient build=webClientBuilder.clientConnector(new ReactorClientHttpConnector(httpClient))
-    			.baseUrl("http://BUSINESSDOMAIN-PRODUCTS/products")
-    			.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-    			.build();
-    	
-    	return build.method(HttpMethod.GET).uri("/"+id)
-    			.retrieve()
-    			.bodyToMono(JsonNode.class)
-    			.map(jsonNode -> jsonNode.get("name").asText())
-    			.block();
-    }
-    
-    private List<?> getTransactions(String iban) {
-    	WebClient build=webClientBuilder.clientConnector(new ReactorClientHttpConnector(httpClient))
-    			.baseUrl("http://BUSINESSDOMAIN-TRANSACTIONS/transactions")
-    			.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-    			.build();
-    	
-    	List<?> transactions =  build.method(HttpMethod.GET).uri(uriBuilder->uriBuilder
-    			.path("/getAccount")
-    			.queryParam("iban",iban)
-    			.build())
-				.retrieve().bodyToFlux(Object.class).collectList()
-    			.block();
-    	
-    	return transactions;
-    }
+  
 }

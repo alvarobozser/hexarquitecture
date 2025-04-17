@@ -12,11 +12,11 @@ import io.swagger.v3.oas.annotations.Hidden;
 @Hidden
 @RestControllerAdvice
 public class ApiExceptionHandler {
-	
+
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<?> handleUnknownHostExpection(Exception ex) {
-		
+
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-				.body(new StandarizeApiExceptionResponse("Técnico", "Input Output Error", "1024", ex.getMessage()));
+				.body(new StandarizeApiExceptionResponse("Error Técnico", "Input Output Error", "1024", ex.getMessage()));
 	}
 }

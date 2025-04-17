@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.paymentchain.billing.controller;
 
 import com.paymentchain.billing.entities.Invoice;
@@ -21,51 +16,47 @@ import com.paymentchain.billing.respository.InvoiceRepository;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
 
-/**
- *
- * @author sotobotero
- */
 @RestController
 @RequestMapping("/billing")
 public class InvoiceRestController {
-    
-    @Autowired
-    InvoiceRepository billingRepository;
-    
-    @GetMapping()
-    public List<Invoice> list() {
-        return billingRepository.findAll();
-    }
-    
-    @GetMapping("/{id}")
-    public ResponseEntity<?>  get(@PathVariable long id) {
-          Optional<Invoice> invoice = billingRepository.findById(id);
-        if (invoice.isPresent()) {
-            return new ResponseEntity<>(invoice.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-    
-    @PutMapping("/{id}")
-    public ResponseEntity<?> put(@PathVariable String id, @RequestBody Invoice input) {
-        return null;
-    }
-    
-    @PostMapping
-    public ResponseEntity<?> post(@RequestBody Invoice input) {
-        Invoice save = billingRepository.save(input);
-        return ResponseEntity.ok(save);
-    }
-    
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id) {
-         Optional<Invoice> dto = billingRepository.findById(Long.valueOf(id));
-        if (!dto.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-        billingRepository.delete(dto.get());
-        return ResponseEntity.ok().build();
-    }
-    
+
+	@Autowired
+	InvoiceRepository billingRepository;
+
+	@GetMapping()
+	public List<Invoice> list() {
+		return billingRepository.findAll();
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<?> get(@PathVariable long id) {
+		Optional<Invoice> invoice = billingRepository.findById(id);
+		if (invoice.isPresent()) {
+			return new ResponseEntity<>(invoice.get(), HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<?> put(@PathVariable String id, @RequestBody Invoice input) {
+		return null;
+	}
+
+	@PostMapping
+	public ResponseEntity<?> post(@RequestBody Invoice input) {
+		Invoice save = billingRepository.save(input);
+		return ResponseEntity.ok(save);
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> delete(@PathVariable String id) {
+		Optional<Invoice> dto = billingRepository.findById(Long.valueOf(id));
+		if (!dto.isPresent()) {
+			return ResponseEntity.notFound().build();
+		}
+		billingRepository.delete(dto.get());
+		return ResponseEntity.ok().build();
+	}
+
 }

@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import de.codecentric.boot.admin.server.config.EnableAdminServer;
 
-
 @Configuration
 @EnableAdminServer
 @EnableAutoConfiguration
